@@ -60,7 +60,10 @@ int main(int argc, char** argv) {
     fread(buffer, fileSize, 1, file);
     fclose(file);
 
-    print_digest(sha256hash(buffer, fileSize));
+    uint32_t *digest = sha256hash(buffer, fileSize);
+    print_digest(digest);
+    free(buffer);
+    free(digest);
 }
 
 uint32_t* sha256hash(uint8_t* rawM, uint64_t size) {
