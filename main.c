@@ -105,7 +105,7 @@ uint32_t* sha256hash(uint8_t* rawM, uint64_t size) {
     for (int i = 1; i <= N; i++) {
         // Sec. 6.2.2
         // Step 1. Prepare the message schedule
-        for (int t = 0; t <= 64; t++) {
+        for (int t = 0; t < 64; t++) {
             if (t < 16) {
                 W[t] = SWAP_BYTE_ORDER_32( ( (uint32_t*)(M + (i-1) * 64) )[t] );
             } else {
