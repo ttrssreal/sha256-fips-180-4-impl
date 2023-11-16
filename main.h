@@ -1,7 +1,7 @@
 void usage(char* run);
 void print_digest(uint32_t* digest);
 
-uint32_t* sha256hash(char* rawM);
+uint32_t* sha256hash(uint8_t* rawM, uint64_t size);
 
 static inline uint32_t ROTR(uint32_t x, int n);
 

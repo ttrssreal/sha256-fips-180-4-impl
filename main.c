@@ -40,39 +40,40 @@ const uint32_t sha256constants[] = {
 };
 
 int main(int argc, char** argv) {
-    if (argc > 3 || argc < 2) {
+    if (argc < 2) {
         usage(argv[0]);
         return 1;
     }
-    if (!strcmp(argv[1], "file") && argc == 3) {
-        char* filename = argv[2];
-        FILE* f;
-        if (!(f = fopen(filename, "r"))) {
-            printf("Couldn't open the file %s\n", filename);
-            return 0;
-        }
-        char* buf = malloc(30000);
-        fread(buf, 1, 30000, f);
-        print_digest(sha256hash(buf));
-    } else if (argc == 2) {
-        print_digest(sha256hash(argv[1]));
-    } else {
-        usage(argv[0]);
+    // Open the file in binary mode
+    FILE *file = fopen(argv[1], "rb");
+    if (!file) {
+        printf("Error opening the file.\n");
+        return 1;
     }
-    return 0;
+
+    //Gets the file size by seeking to the end of the file and then rewinding
+    fseek(file, 0, SEEK_END);
+    size_t fileSize = ftell(file);
+    rewind(file);
+
+    uint8_t* buffer = malloc(fileSize);
+    fread(buffer, fileSize, 1, file);
+    fclose(file);
+
+    print_digest(sha256hash(buffer, fileSize));
 }
 
-uint32_t* sha256hash(char* rawM) {
+uint32_t* sha256hash(uint8_t* rawM, uint64_t size) {
     // Sec. 5.1.1
     // Pad message to a multiple of 512 bits
-    uint64_t l = (uint64_t)(strlen(rawM) * 8);
+    uint64_t l = size * 8;
 
     int k = ((448 - 1 - l) % 512 + 512) % 512;
 
     uint64_t N = (l + 1 + k + 64) / 512;
     uint8_t* M = malloc((l + 1 + k + 64) / 8);
 
-    strcpy(M, rawM);
+    memcpy(M, rawM, size);
     *(M + l / 8) = 0x1 << 0x7;
 
     // 10101010 1'0000000' = 7, '000...' = k-7
@@ -154,8 +155,7 @@ uint32_t* sha256hash(char* rawM) {
 
 void usage(char* run) {
     printf("Usage:\n");
-    printf("%s <TEXT>\n", run);
-    printf("%s file <FLIE NAME>\n", run);
+    printf("%s <file>\n", run);
     return;
 }
 
