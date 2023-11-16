@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    //Gets the file size by seeking to the end of the file and then rewinding
+    // Gets the file size by seeking to the end of the file and then rewinding
     fseek(file, 0, SEEK_END);
     size_t fileSize = ftell(file);
     rewind(file);
